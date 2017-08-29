@@ -1,0 +1,8 @@
+db/MongoConnector.class
+main/UserServiceApp.class
+main/UserServiceController.class
+exception/RequiredAttributeMissingException.class
+model/User.class
+validation/Validation.class
+db/UserDAO.class
+exception/ValidationFailedException.class
