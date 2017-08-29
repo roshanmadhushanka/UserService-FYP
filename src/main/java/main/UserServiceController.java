@@ -68,19 +68,21 @@ public class UserServiceController {
             Get user details
          */
 
+        String response = null;
+
+        // Load users
         UserDAO userDAO = new UserDAO();
         List<User> userList = userDAO.read(user);
 
+        // Convert result in to JSON
         ObjectMapper objectMapper = new ObjectMapper();
-        String jsonInString = null;
-
         try{
-            jsonInString = objectMapper.writeValueAsString(userList);
+            response = objectMapper.writeValueAsString(userList);
         } catch (JsonProcessingException e) {
 
         }
 
-        return new ResponseEntity<String>(jsonInString, HttpStatus.OK);
+        return new ResponseEntity<String>(response, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/removeUser", method = RequestMethod.POST)
