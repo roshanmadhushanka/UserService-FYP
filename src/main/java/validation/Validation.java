@@ -8,22 +8,22 @@ import org.bouncycastle.cert.ocsp.Req;
 /**
  * Created by roshanalwis on 8/24/17.
  */
-public class Validation {
+public abstract class Validation {
 
     // Attribute validation
-    private static boolean validateFirstName(String firstName){
+    public static boolean validateFirstName(String firstName){
         return firstName.matches( "[A-Z][a-zA-Z]*" );
     }
 
-    private static boolean validateLastName(String lastName){
+    public static boolean validateLastName(String lastName){
         return lastName.matches( "[a-zA-z]+([ '-][a-zA-Z]+)*" );
     }
 
-    private static boolean validateEmail(String email){
+    public static boolean validateEmail(String email){
         return email.matches("^[A-Za-z0-9+_.-]+@(.+)$");
     }
 
-    private static boolean validatePassword(String password){
+    public static boolean validatePassword(String password){
         return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$");
     }
 

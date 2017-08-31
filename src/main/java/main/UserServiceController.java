@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import sys.Password;
 import validation.Validation;
 
 import java.util.List;
@@ -38,6 +39,9 @@ public class UserServiceController {
             // Validate user object
             Validation.userValidation(user);
 
+            // Hash password
+            user.setPassword(Password.getSaltedHash(user.getPassword()));
+
             // Create database access object
             UserDAO userDAO = new UserDAO();
 
@@ -59,11 +63,13 @@ public class UserServiceController {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.OK);
         } catch (ValidationFailedException e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.OK);
         }
     }
 
     @RequestMapping(value = "/getUser", method = RequestMethod.POST)
-    public ResponseEntity<String> getUser(@RequestBody User user) {
+    public ResponseEntity<String> getUser(@RequestBody User user) throws Exception {
         /*
             Get user details
          */
@@ -98,17 +104,30 @@ public class UserServiceController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<String> login(@RequestBody User user){
+    public ResponseEntity<String> login(@RequestBody User user) throws Exception {
         try{
             Validation.loginValidation(user);
 
             UserDAO userDAO = new UserDAO();
-            List<User> userList = userDAO.read(user);
 
+            // Create temp user to search
+            User tempUser = new User();
+            tempUser.setEmail(user.getEmail());
+
+            // Load user from database
+            List<User> userList = userDAO.read(tempUser);
             if(userList.size() == 0){
+                // If there is no user for the given email
                 return new ResponseEntity<String>("Fail", HttpStatus.OK);
             } else {
-                return new ResponseEntity<String>("Success", HttpStatus.OK);
+                // Select first user from the user list
+                User storedUser = userDAO.read(tempUser).get(0);
+
+                if(Password.check(user.getPassword(), storedUser.getPassword())){
+                    return new ResponseEntity<String>("Success", HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<String>("Fail", HttpStatus.OK);
+                }
             }
         } catch (RequiredAttributeMissingException e){
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.OK);

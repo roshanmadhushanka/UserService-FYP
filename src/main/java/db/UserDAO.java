@@ -55,7 +55,7 @@ public class UserDAO {
         userCollection.updateMany(oldUserObject, updateObject);
     }
 
-    public List<User> read(User user){
+    public List<User> read(User user) {
         Document userObject = toDocument(user);
 
         List<User> userList = new ArrayList<>();
@@ -66,7 +66,6 @@ public class UserDAO {
             userObj.setEmail(obj.getString("email"));
             userObj.setFirstName(obj.getString("firstName"));
             userObj.setLastName(obj.getString("lastName"));
-            userObj.setPassword(obj.getString("password"));
             userList.add(userObj);
         }
         return userList;

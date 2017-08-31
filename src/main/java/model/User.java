@@ -1,6 +1,7 @@
 package model;
 
 import exception.ValidationFailedException;
+import sys.Password;
 
 /**
  * Created by roshanalwis on 8/23/17.

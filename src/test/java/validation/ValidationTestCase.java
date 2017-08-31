@@ -55,7 +55,7 @@ public class ValidationTestCase {
     }
 
     @Test
-    public void failTestValidatePassword(){
+    public void failTestValidatePassword() {
         User user = new User();
         user.setPassword("12345678");
 
@@ -69,7 +69,7 @@ public class ValidationTestCase {
     }
 
     @Test
-    public void failTestRequiredFirstName(){
+    public void failTestRequiredFirstName() {
         User user = new User();
         user.setLastName("Alwis");
         user.setEmail("alwisroshan@gmail.com");
@@ -85,7 +85,7 @@ public class ValidationTestCase {
     }
 
     @Test
-    public void failTestRequiredLastName(){
+    public void failTestRequiredLastName() {
         User user = new User();
         user.setFirstName("Roshan");
         user.setEmail("alwisroshan@gmail.com");
@@ -101,7 +101,7 @@ public class ValidationTestCase {
     }
 
     @Test
-    public void failTestRequiredEmail(){
+    public void failTestRequiredEmail() {
         User user = new User();
         user.setFirstName("Roshan");
         user.setLastName("Alwis");
