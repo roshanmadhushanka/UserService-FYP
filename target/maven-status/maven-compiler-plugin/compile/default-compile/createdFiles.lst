@@ -1,8 +1,11 @@
-db/MongoConnector.class
+security/TokenManager.class
 main/UserServiceApp.class
+security/Password.class
+model/Token.class
+db/MongoConnector.class
 main/UserServiceController.class
-exception/RequiredAttributeMissingException.class
 model/User.class
+exception/RequiredAttributeMissingException.class
 validation/Validation.class
 db/UserDAO.class
 exception/ValidationFailedException.class

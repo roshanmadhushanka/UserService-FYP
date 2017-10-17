@@ -5,16 +5,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import db.UserDAO;
 import exception.RequiredAttributeMissingException;
 import exception.ValidationFailedException;
+import model.Token;
 import model.User;
+import org.bson.Document;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import sys.Password;
+import security.Password;
+import security.TokenManager;
 import validation.Validation;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -34,6 +38,7 @@ public class UserServiceController {
         /*
             Register user for service
          */
+        String response;
 
         try {
             // Validate user object
@@ -53,10 +58,12 @@ public class UserServiceController {
             if(result.size() == 0){
                 // Add user to the database
                 userDAO.create(user);
-                return new ResponseEntity<String>("Success", HttpStatus.OK);
+                response = "Sucess";
+                return new ResponseEntity<String>(response, HttpStatus.OK);
             } else {
                 // User already in the database
-                return new ResponseEntity<String>("Email has already registered to the service", HttpStatus.OK);
+                response = "Email has already registered to the service";
+                return new ResponseEntity<String>(response, HttpStatus.OK);
             }
 
         } catch (RequiredAttributeMissingException e) {
@@ -85,7 +92,7 @@ public class UserServiceController {
         try{
             response = objectMapper.writeValueAsString(userList);
         } catch (JsonProcessingException e) {
-
+            return new ResponseEntity<String>(response, HttpStatus.OK);
         }
 
         return new ResponseEntity<String>(response, HttpStatus.OK);
@@ -104,8 +111,15 @@ public class UserServiceController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<String> login(@RequestBody User user) throws Exception {
+    public ResponseEntity<String> login(@RequestBody User user, HttpServletRequest request) throws Exception {
+        /*
+            Login validation
+         */
+
+        String response = null;
+
         try{
+            // Validate login parameters
             Validation.loginValidation(user);
 
             UserDAO userDAO = new UserDAO();
@@ -118,15 +132,36 @@ public class UserServiceController {
             List<User> userList = userDAO.read(tempUser);
             if(userList.size() == 0){
                 // If there is no user for the given email
-                return new ResponseEntity<String>("Fail", HttpStatus.OK);
+                response = "Fail";
+                return new ResponseEntity<String>(response, HttpStatus.OK);
             } else {
                 // Select first user from the user list
                 User storedUser = userDAO.read(tempUser).get(0);
 
                 if(Password.check(user.getPassword(), storedUser.getPassword())){
-                    return new ResponseEntity<String>("Success", HttpStatus.OK);
+                    // Generate a token
+                    Token token = new Token(user.getId(), request.getRemoteAddr(), storedUser.getPassword());
+
+                    // Store token
+                    TokenManager.addToken(token);
+
+                    // Create token transfer object
+                    Document tokenTransferObject = new Document();
+                    tokenTransferObject.put("token", token.getAccessToken());
+                    tokenTransferObject.put("id", token.getUserId());
+
+                    // Convert result in to JSON
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    try{
+                        response = objectMapper.writeValueAsString(tokenTransferObject);
+                    } catch (JsonProcessingException e) {
+                        return new ResponseEntity<String>(response, HttpStatus.OK);
+                    }
+
+                    return new ResponseEntity<String>(response, HttpStatus.OK);
                 } else {
-                    return new ResponseEntity<String>("Fail", HttpStatus.OK);
+                    response = "Fail";
+                    return new ResponseEntity<String>(response, HttpStatus.OK);
                 }
             }
         } catch (RequiredAttributeMissingException e){
@@ -134,5 +169,15 @@ public class UserServiceController {
         } catch (ValidationFailedException e){
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.OK);
         }
+    }
+
+    @RequestMapping(value = "/addUrl")
+    public ResponseEntity<String> loggedUsers(){
+        /*
+            Return active user list
+        */
+
+        String response = null;
+        return new ResponseEntity<String>(response, HttpStatus.OK);
     }
 }

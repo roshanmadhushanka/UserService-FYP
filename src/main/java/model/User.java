@@ -1,13 +1,11 @@
 package model;
 
-import exception.ValidationFailedException;
-import sys.Password;
-
 /**
  * Created by roshanalwis on 8/23/17.
  */
 
 public class User {
+    private long id;
     private String email;
     private String firstName;
     private String lastName;
@@ -15,6 +13,14 @@ public class User {
 
     public User(){
 
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getEmail() {

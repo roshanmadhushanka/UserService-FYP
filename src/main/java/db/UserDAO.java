@@ -37,10 +37,16 @@ public class UserDAO {
         if(user.getPassword() != null)
             userObject.put("password", user.getPassword());
 
+        if(user.getId() > 0)
+            userObject.put("id", user.getId());
+
         return userObject;
     }
 
     public void create(User user){
+        // Primary key would be the increment of previous records
+        user.setId(userCollection.count() + 1);
+
         Document userObject = toDocument(user);
         userCollection.insertOne(userObject);
     }
@@ -63,9 +69,15 @@ public class UserDAO {
         for (Document obj: cursor
                 ) {
             User userObj = new User();
-            userObj.setEmail(obj.getString("email"));
-            userObj.setFirstName(obj.getString("firstName"));
-            userObj.setLastName(obj.getString("lastName"));
+            try{
+                userObj.setId(obj.getLong("id"));
+                userObj.setEmail(obj.getString("email"));
+                userObj.setFirstName(obj.getString("firstName"));
+                userObj.setLastName(obj.getString("lastName"));
+                userObj.setPassword(obj.getString("password"));
+            } catch (NullPointerException e) {
+                System.out.println("Attribute not found");
+            }
             userList.add(userObj);
         }
         return userList;
@@ -76,3 +88,4 @@ public class UserDAO {
         userCollection.deleteMany(userObject);
     }
 }
+

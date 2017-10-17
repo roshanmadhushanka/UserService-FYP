@@ -3,7 +3,6 @@ package validation;
 import exception.RequiredAttributeMissingException;
 import exception.ValidationFailedException;
 import model.User;
-import org.bouncycastle.cert.ocsp.Req;
 
 /**
  * Created by roshanalwis on 8/24/17.
